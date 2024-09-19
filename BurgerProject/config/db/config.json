@@ -2,6 +2,6 @@
     "host":     "MSI.local",
     "user":     "dbadm",
     "password": "P@ssw0rd",
-    "database": "eshop",
+    "database": "burger",
     "multipleStatements": true
 }

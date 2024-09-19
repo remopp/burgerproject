@@ -1,0 +1,35 @@
+<%- include('../partials/header.ejs') %>
+
+<div class="orders-container"> <!-- Updated to use the same container class -->
+    <h1>Burger Details</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Ingredient</th>
+                <th>Price</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if (ingredients && ingredients.length > 0) { %>
+                <% ingredients.forEach(ingredient => { %>
+                <tr>
+                    <td><%= ingredient.ingredient_name %></td>
+                    <td>$<%= ingredient.price %></td>
+                    <td>
+                        <form method="POST" action="/orders/<%= burgerID %>/remove/<%= ingredient.ingredient_id %>">
+                            <button type="submit">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+                <% }) %>
+            <% } else { %>
+                <tr>
+                    <td colspan="3">No ingredients found for this burger</td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+</div>
+
+<%- include('../partials/footer.ejs') %>

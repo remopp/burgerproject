@@ -1,29 +1,31 @@
 <%- include('../partials/header.ejs') %>
 
-<h1>Choose a Burger</h1>
-<table>
-    <thead>
-        <tr>
-            <th>Burger Name</th>
-            <th>Price</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        <% if (burgers && burgers.length > 0) { %>
-            <% burgers.forEach(burger => { %>
+<div class="orders-container">
+    <h1>Available Burgers</h1>
+    <table>
+        <thead>
             <tr>
-                <td><%= burger.burger_name %></td>
-                <td>$<%= burger.burger_price %></td>
-                <td><a href="/orders/<%= burger.burger_id %>"><button>Choose</button></a></td>
+                <th>Burger Name</th>
+                <th>Price</th>
+                <th></th>
             </tr>
-            <% }) %>
-        <% } else { %>
-            <tr>
-                <td colspan="3">No burgers available</td>
-            </tr>
-        <% } %>
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            <% if (burgers && burgers.length > 0) { %>
+                <% burgers.forEach(burger => { %>
+                <tr>
+                    <td><%= burger.burger_name %></td>
+                    <td>$<%= burger.burger_price %></td>
+                    <td><a href="/orders/<%= burger.burger_id %>"><button>Choose</button></a></td>
+                </tr>
+                <% }) %>
+            <% } else { %>
+                <tr>
+                    <td colspan="3">No burgers available</td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+</div>
 
 <%- include('../partials/footer.ejs') %>
