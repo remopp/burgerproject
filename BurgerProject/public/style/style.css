@@ -4,7 +4,7 @@
     padding: 10px 20px;
     position: sticky;
     top: 0;
-    width: 95%;
+    width: 98.%;
     z-index: 90;
 }
 
@@ -45,10 +45,10 @@
     background-color: #333;
     color: white;
     text-align: center;
-    padding: 10px;
-    position: relative;
-    bottom: -800px;
-    width: 100%;
+    padding: 10px 20px;
+    position: fixed; /* Stay fixed at the bottom */
+    bottom: 0; /* Align at the bottom of the viewport */
+    width: 100%; /* Full width */
 }
 
 .footer-container {
@@ -210,4 +210,30 @@ button:focus {
 /* Add hover effects if needed */
 .remove-btn:hover, .increase-btn:hover {
     opacity: 0.8;
+}
+
+.rainbow-text {
+    background: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: bold;
+    background-size: 400%;
+    animation: rainbow-animation 5s ease-in-out infinite;
+}
+
+@keyframes rainbow-animation {
+    0% {
+        background-position: 0%;
+    }
+    100% {
+        background-position: 100%;
+    }
+}
+
+.profile-pic {
+    width: 30px; /* Adjust the size of the picture */
+    height: 30px;
+    border-radius: 50%; /* Makes the image round */
+    margin-left: 10px; /* Adds space between the text and the image */
+    vertical-align: middle; /* Aligns the image with the text */
 }
