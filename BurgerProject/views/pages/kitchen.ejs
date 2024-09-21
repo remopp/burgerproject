@@ -1,0 +1,41 @@
+<%- include('../partials/header.ejs') %>
+
+<div class="kitchen-container">
+    <h1>Finalized Orders</h1>
+    <% if (finalizedOrders && finalizedOrders.length > 0) { %>
+        <table>
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Customer Name</th>
+                    <th>Burger Name</th>
+                    <th>Ingredients</th>
+                    <th>Total Price</th>
+                    <th>Order Time</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% finalizedOrders.forEach(function(order) { %>
+                    <tr>
+                        <td><%= order.order_id %></td>
+                        <td><%= order.customer_name %></td>
+                        <td><%= order.burger_name %></td>
+                        <td><%= order.ingredients %></td>
+                        <td>$<%= order.total_price %></td>
+                        <td><%= order.order_time %></td>
+                        <td>
+                            <!-- Add a button to finish the order -->
+                            <form method="POST" action="/kitchen/complete/<%= order.order_id %>">
+                                <button type="submit" class="complete-btn">Complete</button>
+                            </form>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    <% } else { %>
+        <p>No finalized orders found.</p>
+    <% } %>
+</div>
+
+<%- include('../partials/footer.ejs') %>
