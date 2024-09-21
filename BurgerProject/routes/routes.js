@@ -1,64 +1,62 @@
 const express = require('express');
 const router = express.Router();
-const src = require('../src/src'); // Ensure this points to the correct path for src.js
+const src = require('../src/src');
 
-// Route to render the welcome page
 router.get('/', (req, res) => {
     res.render('pages/welcome', { title: 'Welcome to Our Burger Project' });
 });
 
-// Route to list all burgers
 router.get('/orders', async (req, res) => {
-    try {
-        const burgers = await src.getAllBurgers(); // Fetch all burgers
-        res.render('pages/orders', { burgers, title: 'Available Burgers' }); // Pass burgers to the EJS view
-    } catch (err) {
-        console.error('Error fetching burgers:', err);
-        res.status(500).send('Error fetching burgers');
-    }
+    const burgers = await src.getAllBurgers();
+    console.log('Fetched burgers:', burgers);
+    res.render('pages/orders', { burgers, title: 'Available Burgers' });
 });
 
-// Route to display a specific burger's ingredients
 router.get('/orders/:id', async (req, res) => {
     const burgerID = req.params.id;
-    try {
-        const ingredients = await src.getBurgerIngredients(burgerID);
-        console.log("Fetched ingredients after removal:", ingredients); // Log the result here
-        res.render('pages/burgerDetails', {
-            burgerID,
-            ingredients,
-            title: `Burger Details - ${burgerID}`
-        });
-    } catch (err) {
-        console.error(err); // Log any errors
-        res.status(500).send('Error fetching burger ingredients');
-    }
+    const ingredients = await src.getBurgerIngredients(burgerID);
+    console.log(`Fetched ingredients for burger ${burgerID}:`, ingredients);
+    res.render('pages/burgerDetails', { burgerID, ingredients, title: `Burger Details - ${burgerID}` });
 });
 
-// Route to remove an ingredient from a burger
-router.post('/orders/:id/remove/:ingredientID', async (req, res) => {
+router.post('/orders/:id/select', async (req, res) => {
+    const sessionID = req.session.id;
     const burgerID = req.params.id;
+    const customBurgerID = await src.createCustomBurger(sessionID, burgerID);
+    console.log(`Custom burger created with ID: ${customBurgerID}`);
+    res.redirect(`/orders/custom/${customBurgerID}`);
+});
+
+router.get('/orders/custom/:id', async (req, res) => {
+    const customBurgerID = req.params.id;
+    const ingredients = await src.getCustomBurgerIngredients(customBurgerID);
+    const totalPrice = ingredients.reduce((sum, ingredient) => sum + (ingredient.price * ingredient.quantity), 0);
+    res.render('pages/customBurgerDetails', { customBurgerID, ingredients, totalPrice, title: `Customize Your Burger` });
+});
+
+router.post('/orders/custom/:id/remove/:ingredientID', async (req, res) => {
+    const customBurgerID = req.params.id;
     const ingredientID = req.params.ingredientID;
-    try {
-        await src.removeIngredient(burgerID, ingredientID); // Calls the removal function
-        res.redirect(`/orders/${burgerID}`); // Redirect back to the burger details page
-    } catch (err) {
-        console.error('Error removing ingredient:', err);
-        res.status(500).send('Error removing ingredient');
-    }
+    console.log(`Removing ingredient ${ingredientID} from custom burger ${customBurgerID}`);
+    await src.removeCustomBurgerIngredient(customBurgerID, ingredientID);
+    res.redirect(`/orders/custom/${customBurgerID}`);
 });
 
-// Route to add a custom burger order to the orders table
-router.post('/orders/:id/complete', async (req, res) => {
+router.post('/orders/custom/:id/complete', async (req, res) => {
     const customerID = req.body.customerID;
-    const burgerID = req.params.id;
+    const customBurgerID = req.params.id;
     const totalPrice = req.body.totalPrice;
-    try {
-        await src.addOrder(customerID, burgerID, totalPrice);
-        res.redirect('/orders');
-    } catch (err) {
-        res.status(500).send('Error adding order');
-    }
+    console.log(`Completing order for customer ${customerID} with custom burger ${customBurgerID} at total price ${totalPrice}`);
+    await src.addOrder(customerID, customBurgerID, totalPrice);
+    res.redirect('/orders');
+});
+
+router.post('/orders/custom/:id/increase/:ingredientID', async (req, res) => {
+    const customBurgerID = req.params.id;
+    const ingredientID = req.params.ingredientID;
+    console.log(`Adding ingredient ${ingredientID} to custom burger ${customBurgerID}`);
+    await src.addCustomBurgerIngredient(customBurgerID, ingredientID);
+    res.redirect(`/orders/custom/${customBurgerID}`);
 });
 
 module.exports = router;

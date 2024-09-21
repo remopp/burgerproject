@@ -1,23 +1,25 @@
 <%- include('../partials/header.ejs') %>
 
-<div class="orders-container"> <!-- Updated to use the same container class -->
-    <h1>Burger Details</h1>
+<div class="burger-details-container">
+    <h1>Customize Your Burger</h1>
+    
     <table>
         <thead>
             <tr>
-                <th>Ingredient</th>
+                <th>Ingredient Name</th>
                 <th>Price</th>
-                <th></th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
             <% if (ingredients && ingredients.length > 0) { %>
-                <% ingredients.forEach(ingredient => { %>
+                <% ingredients.forEach(function(ingredient) { %>
                 <tr>
                     <td><%= ingredient.ingredient_name %></td>
                     <td>$<%= ingredient.price %></td>
                     <td>
-                        <form method="POST" action="/orders/<%= burgerID %>/remove/<%= ingredient.ingredient_id %>">
+                        <!-- Button to remove ingredient -->
+                        <form method="POST" action="/orders/custom/<%= burgerID %>/remove/<%= ingredient.ingredient_id %>">
                             <button type="submit">Remove</button>
                         </form>
                     </td>
@@ -30,6 +32,12 @@
             <% } %>
         </tbody>
     </table>
+
+    <!-- Button to complete the burger and add to order -->
+    <form method="POST" action="/orders/custom/<%= burgerID %>/complete">
+        <input type="hidden" name="totalPrice" value="<%= totalPrice %>"> <!-- Add logic to calculate totalPrice -->
+        <button type="submit">Complete Order</button>
+    </form>
 </div>
 
 <%- include('../partials/footer.ejs') %>

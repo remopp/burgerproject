@@ -1,0 +1,49 @@
+<%- include('../partials/header.ejs') %>
+
+<div class="custom-burger-details-container">
+    <h1>Customize Your Burger</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Ingredient Name</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if (ingredients && ingredients.length > 0) { %>
+                <% ingredients.forEach(function(ingredient) { %>
+                <tr>
+                    <td><%= ingredient.ingredient_name %></td>
+                    <td>$<%= ingredient.price %></td>
+                    <td><%= ingredient.quantity %></td>
+                    <td>
+                        <div class="action-buttons">
+                            <form method="POST" action="/orders/custom/<%= customBurgerID %>/remove/<%= ingredient.ingredient_id %>" class="inline-form">
+                                <button type="submit" class="remove-btn">Remove</button>
+                            </form>   
+
+                            <form method="POST" action="/orders/custom/<%= customBurgerID %>/increase/<%= ingredient.ingredient_id %>" class="inline-form">
+                                <button type="submit" class="increase-btn">Add</button>
+                            </form>  
+                        </div>                    
+                    </td>
+                </tr>
+                <% }) %>
+            <% } else { %>
+                <tr>
+                    <td colspan="4">No ingredients found for this burger</td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+    
+    <form method="POST" action="/orders/custom/<%= customBurgerID %>/complete">
+        <input type="hidden" name="totalPrice" value="<%= totalPrice %>">
+        <button type="submit">Complete Order</button>
+    </form>    
+</div>
+
+<%- include('../partials/footer.ejs') %>

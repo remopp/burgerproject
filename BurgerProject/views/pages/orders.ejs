@@ -7,16 +7,21 @@
             <tr>
                 <th>Burger Name</th>
                 <th>Price</th>
-                <th></th>
+                <th>Select</th>
             </tr>
         </thead>
         <tbody>
-            <% if (burgers && burgers.length > 0) { %>
-                <% burgers.forEach(burger => { %>
+            <% if (burgers && burgers.length > 0) { %> <!-- Ensure this checks for length -->
+                <% burgers.forEach(function(burger) { %> <!-- Correct iteration syntax -->
                 <tr>
-                    <td><%= burger.burger_name %></td>
-                    <td>$<%= burger.burger_price %></td>
-                    <td><a href="/orders/<%= burger.burger_id %>"><button>Choose</button></a></td>
+                    <td><%= burger.burger_name %></td> <!-- Access the burger name -->
+                    <td>$<%= burger.burger_price %></td> <!-- Access the burger price -->
+                    <td>
+                        <!-- Form to select the burger (will POST to /orders/:id/select) -->
+                        <form method="POST" action="/orders/<%= burger.burger_id %>/select">
+                            <button type="submit">Select</button>
+                        </form>
+                    </td>
                 </tr>
                 <% }) %>
             <% } else { %>

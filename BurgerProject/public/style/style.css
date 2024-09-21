@@ -183,3 +183,31 @@ button:focus {
         font-size: 0.9em;
     }
 }
+
+.action-buttons {
+    display: flex;
+    gap: 10px; /* Add space between the buttons */
+}
+
+.inline-form {
+    display: inline-block;
+}
+
+.remove-btn, .increase-btn {
+    background-color: #ff4c4c; /* Example color for remove button */
+    border: none;
+    padding: 5px 10px;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.increase-btn {
+    background-color: #4CAF50; /* Example color for add button */
+}
+
+/* Add hover effects if needed */
+.remove-btn:hover, .increase-btn:hover {
+    opacity: 0.8;
+}

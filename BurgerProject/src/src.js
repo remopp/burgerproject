@@ -20,34 +20,55 @@ async function initDB() {
 // Fetch all burgers
 async function getAllBurgers() {
     await initDB();
-    const rows = await db.query('CALL GetAllBurgers()');
-    return rows[0]; // Return the first result set from the stored procedure
+    const [rows] = await db.query('CALL GetAllBurgers()');
+    return rows;
 }
 
-
-// Fetch ingredients for a specific burger
+// Fetch ingredients for a specific predefined burger
 async function getBurgerIngredients(burger_id) {
     await initDB();
     const [rows] = await db.query('CALL GetBurgerIngredients(?)', [burger_id]);
-    return rows; // Ensure this returns the actual data
+    return rows;
 }
 
-// Remove an ingredient from a burger
-async function removeIngredient(burgerID, ingredientID) {
-    console.log(`Attempting to remove ingredient ${ingredientID} from burger ${burgerID}`); // Log this
+// Create a custom burger
+async function createCustomBurger(session_id, burger_id) {
     await initDB();
-    await db.query('CALL RemoveBurgerIngredient(?, ?)', [burgerID, ingredientID]);
+    const result = await db.query('CALL CreateCustomBurger(?, ?)', [session_id, burger_id]);
+    return result[0][0].custom_burger_id; // Assuming the procedure returns the new custom burger ID
 }
 
-// Add a custom burger order
-async function addOrder(customer_id, burger_id, total_price) {
+// Fetch ingredients for a specific custom burger
+async function getCustomBurgerIngredients(custom_burger_id) {
     await initDB();
-    await db.query('CALL AddCustomBurgerOrder(?, ?, ?)', [customer_id, burger_id, total_price]);
+    const [rows] = await db.query('CALL GetCustomBurgerIngredients(?)', [custom_burger_id]);
+    return rows;
+}
+
+// Reduce the quantity of an ingredient in the custom burger or remove it if the quantity is zero
+async function removeCustomBurgerIngredient(custom_burger_id, ingredient_id) {
+    await initDB();
+    await db.query('CALL ReduceCustomBurgerIngredientQuantity(?, ?)', [custom_burger_id, ingredient_id]);
+}
+
+// Increase the quantity of an ingredient in the custom burger
+async function addCustomBurgerIngredient(custom_burger_id, ingredient_id) {
+    await initDB();
+    await db.query('CALL IncreaseCustomBurgerIngredientQuantity(?, ?)', [custom_burger_id, ingredient_id]);
+}
+
+// Add an order for a custom burger
+async function addOrder(customer_id, custom_burger_id, total_price) {
+    await initDB();
+    await db.query('CALL AddOrder(?, ?, ?)', [customer_id, custom_burger_id, total_price]);
 }
 
 module.exports = {
     getAllBurgers,
     getBurgerIngredients,
-    removeIngredient,
+    createCustomBurger,
+    getCustomBurgerIngredients,
+    removeCustomBurgerIngredient,
+    addCustomBurgerIngredient, // Updated function for adding quantity
     addOrder
 };
