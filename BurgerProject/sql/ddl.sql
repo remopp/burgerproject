@@ -13,7 +13,7 @@ DROP TABLE IF EXISTS Customers;
 CREATE TABLE Customers (
     customer_id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL
+    email VARCHAR(255) NOT NULL DEFAULT 'None'
 );
 
 -- Ingredients table to store all available ingredients
@@ -65,6 +65,32 @@ CREATE TABLE Orders (
     custom_burger_id INT,
     total_price DECIMAL(10, 2),
     order_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status ENUM('pending', 'completed') DEFAULT 'pending',  -- Add status to track order state
     FOREIGN KEY (customer_id) REFERENCES Customers(customer_id),
     FOREIGN KEY (custom_burger_id) REFERENCES CustomBurgers(custom_burger_id) ON DELETE CASCADE
 );
+
+-- FinalBurgers table to store finalized burgers (ordered burgers)
+CREATE TABLE FinalBurgers (
+    final_burger_id INT PRIMARY KEY AUTO_INCREMENT,
+    customer_id INT,
+    custom_burger_name VARCHAR(255),
+    total_price DECIMAL(10, 2),
+    order_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (customer_id) REFERENCES Customers(customer_id) ON DELETE CASCADE
+);
+
+-- FinalBurger_Ingredients table to store ingredients of finalized burgers
+CREATE TABLE FinalBurger_Ingredients (
+    final_burger_id INT,
+    ingredient_id INT,
+    quantity INT DEFAULT 1,
+    PRIMARY KEY (final_burger_id, ingredient_id),
+    FOREIGN KEY (final_burger_id) REFERENCES FinalBurgers(final_burger_id) ON DELETE CASCADE,
+    FOREIGN KEY (ingredient_id) REFERENCES Ingredients(ingredient_id) ON DELETE CASCADE
+);
+
+-- Update customer_id in Orders where order_id is 1
+UPDATE Orders
+SET customer_id = 1 -- assuming the customer ID is known
+WHERE order_id = 1;

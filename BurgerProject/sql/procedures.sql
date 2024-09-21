@@ -1,6 +1,5 @@
 use burger;
 
--- Drop and recreate the GetAllBurgers procedure
 DROP PROCEDURE IF EXISTS GetAllBurgers;
 DELIMITER //
 CREATE PROCEDURE GetAllBurgers()
@@ -13,8 +12,6 @@ BEGIN
 END //
 DELIMITER ;
 
-
--- Drop and recreate the GetBurgerIngredients procedure
 DROP PROCEDURE IF EXISTS GetBurgerIngredients;
 DELIMITER //
 CREATE PROCEDURE GetBurgerIngredients(IN selected_burger_id INT)
@@ -27,7 +24,6 @@ END //
 DELIMITER ;
 
 
--- Drop and recreate the CreateCustomBurger procedure
 DROP PROCEDURE IF EXISTS CreateCustomBurger;
 DELIMITER //
 CREATE PROCEDURE CreateCustomBurger(IN session_id VARCHAR(255), IN burger_id INT)
@@ -56,7 +52,6 @@ BEGIN
 END //
 DELIMITER ;
 
-
 DROP PROCEDURE IF EXISTS GetCustomBurgerIngredients;
 DELIMITER //
 CREATE PROCEDURE GetCustomBurgerIngredients(IN custom_burger_id INT)
@@ -67,7 +62,6 @@ BEGIN
     WHERE cbi.custom_burger_id = custom_burger_id;
 END //
 DELIMITER ;
-
 
 -- Drop and recreate the RemoveCustomBurgerIngredient procedure
 DROP PROCEDURE IF EXISTS RemoveCustomBurgerIngredient;
@@ -85,17 +79,14 @@ BEGIN
 END //
 DELIMITER ;
 
-
--- Drop and recreate the AddOrder procedure
 DROP PROCEDURE IF EXISTS AddOrder;
 DELIMITER //
-CREATE PROCEDURE AddOrder(IN customer_id INT, IN custom_burger_id INT, IN total_price DECIMAL(10, 2))
+CREATE PROCEDURE AddOrder(IN customerID INT, IN customBurgerID INT, IN totalPrice DECIMAL(10, 2))
 BEGIN
-    INSERT INTO Orders (customer_id, custom_burger_id, total_price)
-    VALUES (customer_id, custom_burger_id, total_price);
+    INSERT INTO Orders (customer_id, custom_burger_id, total_price, status) 
+    VALUES (customerID, customBurgerID, totalPrice, 'pending');
 END //
 DELIMITER ;
-
 
 DROP PROCEDURE IF EXISTS ReduceCustomBurgerIngredientQuantity;
 DELIMITER //
@@ -107,9 +98,6 @@ BEGIN
 END //
 DELIMITER ;
 
-
-
-
 DROP PROCEDURE IF EXISTS IncreaseCustomBurgerIngredientQuantity;
 DELIMITER //
 CREATE PROCEDURE IncreaseCustomBurgerIngredientQuantity(IN custom_burger_id_in INT, IN ingredient_id_in INT)
@@ -120,5 +108,101 @@ BEGIN
 END //
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS GetAllOrders;
+DELIMITER //
+CREATE PROCEDURE GetAllOrders()
+BEGIN
+    SELECT o.order_id, c.name AS customer_name, cb.custom_burger_id, cb.custom_name, cb.total_price, i.ingredient_name, cbi.quantity
+    FROM Orders o
+    JOIN Customers c ON o.customer_id = c.customer_id
+    JOIN CustomBurgers cb ON o.custom_burger_id = cb.custom_burger_id
+    JOIN CustomBurger_Ingredients cbi ON cb.custom_burger_id = cbi.custom_burger_id
+    JOIN Ingredients i ON cbi.ingredient_id = i.ingredient_id
+    ORDER BY o.order_time DESC;
+END //
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS FinalizeCustomBurger;
+DELIMITER //
+CREATE PROCEDURE FinalizeCustomBurger(
+    IN customer_id INT, 
+    IN custom_burger_id_param INT, -- Renamed input param to avoid collision
+    IN custom_burger_name VARCHAR(255), 
+    IN total_price DECIMAL(10, 2)
+)
+BEGIN
+    -- Insert into FinalBurgers table
+    INSERT INTO FinalBurgers (customer_id, custom_burger_name, total_price)
+    VALUES (customer_id, custom_burger_name, total_price);
+    
+    -- Get the final burger ID for the newly inserted row
+    SET @final_burger_id = LAST_INSERT_ID();
+    
+    -- Insert ingredients and quantities from CustomBurger_Ingredients into FinalBurger_Ingredients
+    INSERT INTO FinalBurger_Ingredients (final_burger_id, ingredient_id, quantity)
+    SELECT @final_burger_id, ingredient_id, quantity
+    FROM CustomBurger_Ingredients
+    WHERE custom_burger_id = custom_burger_id_param;  -- Fix reference to the input parameter
+    
+    -- Return the final burger ID
+    SELECT @final_burger_id AS final_burger_id;
+END //
+DELIMITER ;
 
 
+
+-- Procedure to fetch all finalized burgers and their ingredients
+DROP PROCEDURE IF EXISTS GetFinalizedBurgers;
+DELIMITER //
+CREATE PROCEDURE GetFinalizedBurgers()
+BEGIN
+    SELECT fb.final_burger_id, fb.custom_burger_name, fb.total_price, fb.order_time, c.name AS customer_name, i.ingredient_name, fbi.quantity, i.price
+    FROM FinalBurgers fb
+    JOIN Customers c ON fb.customer_id = c.customer_id
+    JOIN FinalBurger_Ingredients fbi ON fb.final_burger_id = fbi.final_burger_id
+    JOIN Ingredients i ON fbi.ingredient_id = i.ingredient_id
+    ORDER BY fb.order_time DESC;
+END //
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS GetFinalizedBurgers;
+DELIMITER //
+CREATE PROCEDURE GetFinalizedBurgers()
+BEGIN
+    SELECT fb.final_burger_id, fb.custom_burger_name, fb.total_price, fb.order_time
+    FROM FinalBurgers fb;
+END //
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS GetFinalizedBurgerIngredients;
+DELIMITER //
+CREATE PROCEDURE GetFinalizedBurgerIngredients(IN final_burger_id INT)
+BEGIN
+    SELECT i.ingredient_name, fbi.quantity
+    FROM FinalBurger_Ingredients fbi
+    JOIN Ingredients i ON fbi.ingredient_id = i.ingredient_id
+    WHERE fbi.final_burger_id = final_burger_id;
+END //
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS GetAllOrders;
+DELIMITER //
+CREATE PROCEDURE GetAllOrders()
+BEGIN
+    SELECT 
+        o.order_id,
+        c.name AS customer_name,
+        cb.custom_name AS burger_name,
+        SUM(i.price * cbi.quantity) AS total_price,  -- Calculate total price based on quantity
+        o.order_time,
+        GROUP_CONCAT(CONCAT(i.ingredient_name, ' - Quantity: ', cbi.quantity) SEPARATOR ', ') AS ingredients
+    FROM Orders o
+    JOIN Customers c ON o.customer_id = c.customer_id
+    JOIN CustomBurgers cb ON o.custom_burger_id = cb.custom_burger_id
+    JOIN CustomBurger_Ingredients cbi ON cb.custom_burger_id = cbi.custom_burger_id
+    JOIN Ingredients i ON cbi.ingredient_id = i.ingredient_id
+    WHERE o.status = 'pending'  -- Only show pending orders
+    GROUP BY o.order_id, c.name, cb.custom_name, o.order_time
+    ORDER BY o.order_time DESC;
+END //
+DELIMITER ;
