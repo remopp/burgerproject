@@ -17,35 +17,30 @@ async function initDB() {
     }
 }
 
-// Fetch all burgers
 async function getAllBurgers() {
     await initDB();
     const [rows] = await db.query('CALL GetAllBurgers()');
     return rows;
 }
 
-// Fetch ingredients for a specific predefined burger
 async function getBurgerIngredients(burger_id) {
     await initDB();
     const [rows] = await db.query('CALL GetBurgerIngredients(?)', [burger_id]);
     return rows;
 }
 
-// Create a custom burger
 async function createCustomBurger(session_id, burger_id) {
     await initDB();
     const result = await db.query('CALL CreateCustomBurger(?, ?)', [session_id, burger_id]);
-    return result[0][0].custom_burger_id; // Assuming the procedure returns the new custom burger ID
+    return result[0][0].custom_burger_id;
 }
 
-// Fetch ingredients for a specific custom burger
 async function getCustomBurgerIngredients(custom_burger_id) {
     await initDB();
     const [rows] = await db.query('CALL GetCustomBurgerIngredients(?)', [custom_burger_id]);
     return rows;
 }
 
-// Adjust the quantity of an ingredient in the custom burger (Increase or Decrease)
 async function modifyCustomBurgerIngredientQuantity(custom_burger_id, ingredient_id, action) {
     await initDB();
     if (action === 'increase') {
@@ -55,44 +50,39 @@ async function modifyCustomBurgerIngredientQuantity(custom_burger_id, ingredient
     }
 }
 
-// Add an order
 async function addOrder(customer_id, custom_burger_id, total_price) {
     await initDB();
     await db.query('CALL AddOrder(?, ?, ?)', [customer_id, custom_burger_id, total_price]);
 }
 
-// Fetch all orders
 async function getAllOrders() {
     await initDB();
     const [rows] = await db.query('CALL GetAllOrders()');
     return rows;
 }
 
-// Fetch customer by name
 async function getCustomerByName(name) {
     await initDB();
     const result = await db.query('SELECT * FROM Customers WHERE name = ?', [name]);
-    const rows = Array.isArray(result) ? result : []; // Ensure rows is always an array
-    return rows.length > 0 ? rows[0] : null; // Check if rows exist, return the customer or null if not found
+    const rows = Array.isArray(result) ? result : []; 
+    return rows.length > 0 ? rows[0] : null;
 }
 
-// Create a new customer with a given name
 async function createCustomer(name) {
     await initDB();
     const result = await db.query('INSERT INTO Customers (name) VALUES (?)', [name]);
-    return result.insertId; // Return the customer ID
+    return result.insertId;
 }
 
 async function handleOrder(customerName, customBurgerID, totalPrice) {
     await initDB();
 
-    let customer = await getCustomerByName(customerName); // Fetch customer by name
+    let customer = await getCustomerByName(customerName);
     if (!customer) {
-        const customerID = await createCustomer(customerName); // Create customer if not found
+        const customerID = await createCustomer(customerName);
         customer = { customer_id: customerID };
     }
 
-    // Now, add the order for the found or newly created customer
     await addOrder(customer.customer_id, customBurgerID, totalPrice);
 }
 

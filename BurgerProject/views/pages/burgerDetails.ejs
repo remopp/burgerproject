@@ -42,7 +42,7 @@
     
     <form method="POST" action="/orders/custom/<%= customBurgerID %>/complete">
         <label for="customerName">Enter Your Name:</label>
-        <input type="text" id="customerName" name="customerName" required> <!-- Input field for name -->
+        <input type="text" id="customerName" name="customerName" required>
         <input type="hidden" name="totalPrice" value="<%= totalPrice %>">
         <button type="submit">Complete Order</button>
     </form>

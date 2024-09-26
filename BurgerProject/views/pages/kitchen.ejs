@@ -1,6 +1,4 @@
-<%- include('../partials/header.ejs') %>
-
-<div class="kitchen-container">
+<link rel="stylesheet" href="/style/style.css">
     <h1>Finalized Orders</h1>
     <% if (finalizedOrders && finalizedOrders.length > 0) { %>
         <table>
@@ -25,7 +23,6 @@
                         <td>$<%= order.total_price %></td>
                         <td><%= order.order_time %></td>
                         <td>
-                            <!-- Add a button to finish the order -->
                             <form method="POST" action="/kitchen/complete/<%= order.order_id %>">
                                 <button type="submit" class="complete-btn">Complete</button>
                             </form>
