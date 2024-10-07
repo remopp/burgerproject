@@ -8,6 +8,6 @@ RUN npm install
 
 COPY . .
 
-EXPOSE 1339
+EXPOSE 1340
 
-CMD ["node", "index.js"]
+CMD ["node", "kitchen_index.js"]
