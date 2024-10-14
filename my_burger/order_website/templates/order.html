@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+<head>
+    <title>Order Burger</title>
+</head>
+<body>
+    <h1>Order a Burger</h1>
+    <form method="post">
+        <label>Name: <input type="text" name="name" required></label><br><br>
+
+        <label>Select a Burger:</label><br>
+        {% for burger in burgers %}
+            <input type="radio" name="burger" value="{{ burger }}" required> {{ burger }}<br>
+        {% endfor %}
+        <br>
+
+        <label>Ingredients to Add (comma separated):</label><br>
+        <input type="text" name="ingredients_add" placeholder="e.g., Lettuce, Tomato, Bacon"><br><br>
+
+        <label>Ingredients to Remove (comma separated):</label><br>
+        <input type="text" name="ingredients_remove" placeholder="e.g., Cheese, Onions"><br><br>
+
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>
