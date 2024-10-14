@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for
 import psycopg2
 
 app = Flask(__name__)
@@ -18,7 +18,6 @@ def get_db_connection():
 def init_db():
     conn = get_db_connection()
     c = conn.cursor()
-
 
     c.execute('''
         SELECT EXISTS (
@@ -65,4 +64,4 @@ def delete_order(order_id):
 
 if __name__ == '__main__':
     init_db() 
-    app.run(host='0.0.0.0', port=5001, debug=True)  
+    app.run(host='0.0.0.0', port=5001, debug=True)

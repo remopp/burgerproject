@@ -1,4 +1,4 @@
-from flask import Flask, rendertemplate, request, redirect, urlfor
+from flask import Flask, render_template, request, redirect, url_for
 import psycopg2
 
 app = Flask(__name__)
@@ -12,7 +12,7 @@ DATABASE = {
 }
 
 
-def getdbconnection():
+def get_db_connection():
     conn = psycopg2.connect(**DATABASE)
     return conn
 
@@ -23,7 +23,7 @@ def order():
     if request.method == 'POST':
         name = request.form['name']
         burger = request.form['burger']
-        ingredientstoadd = request.form['ingredients_add']
+        ingredients_to_add = request.form['ingredients_add']
         ingredients_to_remove = request.form['ingredients_remove']
 
         ingredients = f"Add: {ingredients_to_add}, Remove: {ingredients_to_remove}"
