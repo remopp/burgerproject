@@ -13,7 +13,7 @@ DATABASE = {
 }
 
 def get_db_connection():
-    db_host = 'db' if os.getenv('DOCKER_ENV') else 'localhost'
+    db_host = os.getenv('DATABASE_HOST', 'localhost')
     conn = psycopg2.connect(
         dbname=DATABASE['dbname'],
         user=DATABASE['user'],

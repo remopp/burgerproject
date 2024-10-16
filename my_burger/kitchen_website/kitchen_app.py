@@ -7,7 +7,7 @@ DATABASE = {
     'dbname': 'website',
     'user': 'postgres',
     'password': '2c75533f72c9',
-    'host': 'db', 
+    'host': 'db',  # Use 'db' here instead of 'localhost'
     'port': '5432'
 }
 

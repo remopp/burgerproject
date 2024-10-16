@@ -7,10 +7,11 @@ services:
     ports:
       - "5001:5001"
     environment:
+      - DATABASE_HOST=db
       - DATABASE_URL=postgresql://postgres:2c75533f72c9@db/website
     depends_on:
       - db
-    entrypoint: ["sh", "-c", "sleep 6 && python kitchen_app.py"]  
+    entrypoint: ["sh", "-c", "sleep 6 && python kitchen_app.py"]
 
   order_website:
     build:
@@ -18,10 +19,22 @@ services:
     ports:
       - "5000:5000"
     environment:
+      - DATABASE_HOST=db
       - DATABASE_URL=postgresql://postgres:2c75533f72c9@db/website
     depends_on:
       - db
-    entrypoint: ["sh", "-c", "sleep 6 && python order_app.py"]  
+    entrypoint: ["sh", "-c", "sleep 6 && python order_app.py"]
+
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    environment:
+      - DATABASE_HOST=db
+      - DATABASE_URL=postgresql://postgres:2c75533f72c9@db/website
+    depends_on:
+      - db
+    entrypoint: ["sh", "-c", "sleep 6 && pytest -vv"]
 
   db:
     image: postgres:latest
@@ -30,7 +43,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 2c75533f72c9
     volumes:
-      - pg_data:/var/lib/postgresql/data  # To persist data
+      - pg_data:/var/lib/postgresql/data  # Persist data in a volume
 
 volumes:
   pg_data:
