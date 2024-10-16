@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for
 import psycopg2
+import os
 
 app = Flask(__name__)
 
@@ -12,7 +13,14 @@ DATABASE = {
 }
 
 def get_db_connection():
-    conn = psycopg2.connect(**DATABASE)
+    db_host = 'db' if os.getenv('DOCKER_ENV') else 'localhost'
+    conn = psycopg2.connect(
+        dbname=DATABASE['dbname'],
+        user=DATABASE['user'],
+        password=DATABASE['password'],
+        host=db_host,
+        port=DATABASE['port']
+    )
     return conn
 
 @app.route('/', methods=['GET', 'POST'])
