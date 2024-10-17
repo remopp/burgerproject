@@ -1,49 +1,55 @@
+# Docker Compose file to define and manage multi-container applications
 version: '3.8'
 
 services:
+  # Service for the kitchen website
   kitchen_website:
     build:
-      context: ./kitchen_website
+      context: ./kitchen_website  # Build context for the kitchen website
     ports:
-      - "5001:5001"
+      - "5001:5001"  # Map port 5001 of the container to port 5001 on the host
     environment:
-      - DATABASE_HOST=db
-      - DATABASE_URL=postgresql://postgres:2c75533f72c9@db/website
+      - DATABASE_HOST=db  # Set the database host for the kitchen website
+      - DATABASE_URL=postgresql://postgres:2c75533f72c9@db/website  # Set the database URL for connecting to PostgreSQL
     depends_on:
-      - db
-    entrypoint: ["sh", "-c", "sleep 6 && python kitchen_app.py"]
+      - db  # Ensure the database service starts before the kitchen website
+    entrypoint: ["sh", "-c", "sleep 6 && python kitchen_app.py"]  # Delay startup to wait for database readiness
 
+  # Service for the order website
   order_website:
     build:
-      context: ./order_website
+      context: ./order_website  # Build context for the order website
     ports:
-      - "5000:5000"
+      - "5000:5000"  # Map port 5000 of the container to port 5000 on the host
     environment:
-      - DATABASE_HOST=db
-      - DATABASE_URL=postgresql://postgres:2c75533f72c9@db/website
+      - DATABASE_HOST=db  # Set the database host for the order website
+      - DATABASE_URL=postgresql://postgres:2c75533f72c9@db/website  # Set the database URL for connecting to PostgreSQL
     depends_on:
-      - db
-    entrypoint: ["sh", "-c", "sleep 6 && python order_app.py"]
+      - db  # Ensure the database service starts before the order website
+    entrypoint: ["sh", "-c", "sleep 6 && python order_app.py"]  # Delay startup to wait for database readiness
 
+  # Service for running tests
   test:
     build:
-      context: .
-      dockerfile: Dockerfile.test
+      context: .  # Build context for the test environment
+      dockerfile: Dockerfile.test  # Use a specific Dockerfile for the test environment
     environment:
-      - DATABASE_HOST=db
-      - DATABASE_URL=postgresql://postgres:2c75533f72c9@db/website
+      - DATABASE_HOST=db  # Set the database host for the test environment
+      - DATABASE_URL=postgresql://postgres:2c75533f72c9@db/website  # Set the database URL for connecting to PostgreSQL
     depends_on:
-      - db
-    entrypoint: ["sh", "-c", "sleep 6 && pytest -vv"]
+      - db  # Ensure the database service starts before the test environment
+    entrypoint: ["sh", "-c", "sleep 6 && pytest -vv"]  # Delay startup to wait for database readiness and run tests
 
+  # Service for the PostgreSQL database
   db:
-    image: postgres:latest
+    image: postgres:latest  # Use the latest official PostgreSQL image
     environment:
-      POSTGRES_DB: website
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 2c75533f72c9
+      POSTGRES_DB: website  # Set the default database name
+      POSTGRES_USER: postgres  # Set the default database user
+      POSTGRES_PASSWORD: 2c75533f72c9  # Set the database password
     volumes:
-      - pg_data:/var/lib/postgresql/data  # Persist data in a volume
+      - pg_data:/var/lib/postgresql/data  # Persist database data in a named volume
 
+# Named volume to persist PostgreSQL data
 volumes:
   pg_data:
