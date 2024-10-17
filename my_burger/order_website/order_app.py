@@ -5,14 +5,14 @@ import os
 
 app = Flask(__name__)
 
-# # Database configuration for local PostgreSQL (with docker)
-# DATABASE = {
-#     'dbname': 'website',
-#     'user': 'postgres',
-#     'password': '2c75533f72c9',
-#     'host': 'db', 
-#     'port': '5432'
-# }
+# Database configuration for local PostgreSQL (with docker)
+DATABASE = {
+    'dbname': 'website',
+    'user': 'postgres',
+    'password': '2c75533f72c9',
+    'host': 'db', 
+    'port': '5432'
+}
 
 # # Database configuration for local PostgreSQL (without docker)
 # DATABASE = {
@@ -23,16 +23,13 @@ app = Flask(__name__)
 #     'port': '5432'
 # }
 
-DATABASE = {
-    'dbname': 'website',
-    'user': os.getenv('DATABASE_USER', 'myuser'),
-    'password': os.getenv('DATABASE_PASSWORD', 'mypassword'),
-    'host': 'localhost',
-    'port': '5432'
-}
-
-
-
+# DATABASE = {
+#     'dbname': 'website',
+#     'user': os.getenv('DATABASE_USER', 'myuser'),
+#     'password': os.getenv('DATABASE_PASSWORD', 'mypassword'),
+#     'host': 'localhost',
+#     'port': '5432'
+# }
 
 
 def get_db_connection():
@@ -94,11 +91,6 @@ def order():
     # Render the order form with the available burgers
     return render_template('order.html', burgers=burgers)
 
-
-<<<<<<< HEAD
-=======
-
->>>>>>> c8d9299adb3dbdc60eb6827eca930401c4d602f4
 if __name__ == '__main__':
     # runs website
     app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=False)
